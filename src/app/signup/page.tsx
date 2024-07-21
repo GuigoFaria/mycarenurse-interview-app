@@ -2,6 +2,31 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { apiUrl } from "@/helpers";
+import { navigateToLogin } from "../actions";
+export interface Nurse {
+  name: string;
+  email: string;
+  password: string;
+  registrationCouncilNursing: string;
+  stateCouncilNursing: string;
+}
+
+const postNurse = async (data: Nurse) => {
+  const response = await fetch(`${apiUrl}/nurses`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create nurse");
+  }
+
+  return response.body;
+};
 
 export default function Signup() {
   const schema = z.object({
@@ -11,6 +36,10 @@ export default function Signup() {
       .string()
       .min(8, "Sua senha deve conter pelo menos 8 caracteres"),
     confirmPassword: z.string().min(8, "Confirme sua senha"),
+    registrationCouncilNursing: z
+      .string()
+      .min(1, "Número de registro no COREN é obrigatório")
+      .max(6, "Seu número de registro no COREN deve ter 6 dígitos"),
   });
 
   const {
@@ -25,6 +54,7 @@ export default function Signup() {
       email: "",
       password: "",
       confirmPassword: "",
+      registrationCouncilNursing: "",
     },
   });
 
@@ -36,21 +66,29 @@ export default function Signup() {
       });
       return;
     }
-    const body = {
+    const body: Nurse = {
       name: data.name,
       email: data.email,
       password: data.confirmPassword,
+      registrationCouncilNursing: data.registrationCouncilNursing,
+      stateCouncilNursing: "SP",
     };
 
     console.log(body);
+
+    const response = await postNurse(body);
+    console.log(response);
+
+    navigateToLogin();
   };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center 4">
+      <div className="text-2xl font-bold text-gray-800 mb-3">MyCareNurse</div>
       <h1 className="text-3xl mb-8 text-blue-600 font-light">
         Crie seu perfil
       </h1>
-      <div className="text-2xl font-bold text-gray-800">MyCareNurse</div>
+
       <form
         className="flex flex-col items-center"
         onSubmit={handleSubmit(onSubmit)}
@@ -77,6 +115,19 @@ export default function Signup() {
             {...register("email")}
           />
         </div>
+        <div className="flex flex-col max-w-72">
+          {errors.registrationCouncilNursing && (
+            <span className="text-red-500">
+              {errors.registrationCouncilNursing.message}
+            </span>
+          )}
+          <input
+            type="text"
+            placeholder="N. de registro no COREN"
+            className="p-2 mb-2 border border-gray-300 rounded-lg"
+            {...register("registrationCouncilNursing")}
+          />
+        </div>
         <div className="flex flex-col items-center max-w-72">
           {errors.password && (
             <span className="text-red-500">{errors.password.message}</span>
@@ -90,7 +141,7 @@ export default function Signup() {
         </div>
         <div className="flex flex-col max-w-md">
           {errors.confirmPassword && (
-            <span className="text-red-500 mb-4">
+            <span className="text-red-500">
               {errors.confirmPassword.message}
             </span>
           )}

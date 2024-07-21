@@ -1,3 +1,5 @@
+"use client";
+import { signOut } from "next-auth/react";
 import CardList from "./components/CardList";
 
 export default function DutyShifts() {
@@ -6,7 +8,10 @@ export default function DutyShifts() {
       <header className="bg-white shadow">
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
           <div className="text-2xl font-bold text-gray-800">MyCareNurse</div>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+          <button
+            onClick={() => signOut()}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
             Sair
           </button>
         </div>
