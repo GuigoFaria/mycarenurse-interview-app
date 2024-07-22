@@ -74,10 +74,7 @@ export default function Signup() {
       stateCouncilNursing: "SP",
     };
 
-    console.log(body);
-
     const response = await postNurse(body);
-    console.log(response);
 
     navigateToLogin();
   };

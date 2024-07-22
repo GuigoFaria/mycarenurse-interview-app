@@ -1,4 +1,5 @@
 import { apiUrl } from "@/helpers";
+import { decode } from "jsonwebtoken";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
@@ -31,7 +32,13 @@ const nextAuthOptions = {
           const result = await res.json();
 
           if (res.ok && result.access_token) {
-            return result.access_token;
+            const decodedToken = decode(result.access_token) as any;
+
+            return {
+              id: decodedToken?.sub,
+              email: decodedToken.email,
+              accessToken: result.access_token,
+            };
           }
 
           throw new Error(result.message || "Failed to authorize");
@@ -44,11 +51,14 @@ const nextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }: any) {
-      user && (token.user = user);
+      user && (token.user = { ...user });
+
       return token;
     },
     async session({ session, token }: any) {
-      session.accessToken = token.accessToken;
+      session.user = {
+        ...token.user,
+      };
       return session;
     },
   },
