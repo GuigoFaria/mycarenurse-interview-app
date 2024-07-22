@@ -1,9 +1,8 @@
 "use client";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+
+import { useState } from "react";
 import DutyShiftsService from "../services/dutyShifs.service";
 import { Nurse } from "../types/types";
-import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export default function Card({
   title,

@@ -2,9 +2,9 @@ import { getServerSession } from "next-auth";
 import CardList from "./components/CardList";
 import Menu from "./components/Menu";
 import { redirect } from "next/navigation";
-import { nextAuthOptions } from "../api/auth/[...nextauth]/route";
 import { apiUrl } from "@/helpers";
 import { DutyShift } from "./types/types";
+import nextAuthOptions from "../api/auth/[...nextauth]/options";
 
 const getDutyShifts = async (token: string) => {
   const response = await fetch(`${apiUrl}/duty-shifts`, {
